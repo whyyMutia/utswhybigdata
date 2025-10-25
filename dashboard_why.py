@@ -57,9 +57,15 @@ elif theme == "📖 Redup / Baca":
     sidebar_bg = "#F5F3E7"
     sidebar_text = "#333333"
 
+# ===== CSS dinamis =====
 st.markdown(
     f"""
     <style>
+        /* ===== Efek transisi lembut untuk semua elemen utama ===== */
+        .stApp, .block-container, section[data-testid="stSidebar"], section[data-testid="stSidebar"] * {{
+            transition: background-color 0.4s ease, color 0.4s ease !important;
+        }}
+
         /* ===== Tampilan utama ===== */
         .stApp {{
             background-color: {bg_color};
@@ -67,14 +73,21 @@ st.markdown(
         }}
 
         /* ===== Sidebar ===== */
-        div[data-testid="stSidebar"] {{
+        section[data-testid="stSidebar"] {{
             background-color: {sidebar_bg} !important;
+            color: {sidebar_text} !important;
         }}
-        div[data-testid="stSidebar"] * {{
+        section[data-testid="stSidebar"] div,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {{
             color: {sidebar_text} !important;
         }}
 
-        /* ===== Heading dan teks utama ===== */
+        /* ===== Heading & teks utama ===== */
         h1, h2, h3, h4, h5, h6, p, label, span {{
             color: {text_color} !important;
         }}
@@ -86,6 +99,10 @@ st.markdown(
             border-radius: 8px;
             border: none;
             padding: 0.5em 1em;
+            transition: background-color 0.3s ease, color 0.3s ease !important;
+        }}
+        .stButton > button:hover {{
+            filter: brightness(1.1);
         }}
     </style>
     """,
