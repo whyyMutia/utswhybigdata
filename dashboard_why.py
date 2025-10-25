@@ -7,6 +7,11 @@ from PIL import Image
 import cv2
 
 # ==========================
+# Konfigurasi Tampilan
+# ==========================
+st.set_page_config(page_title="Klasifikasi Hewan & Deteksi Bunga", layout="wide")
+
+# ==========================
 # Load Models
 # ==========================
 @st.cache_resource
@@ -29,26 +34,62 @@ animal_classes = ["Kucing", "Anjing", "Satwa Liar"]
 flower_classes = ["Daisy", "Dandelion"]
 
 # ==========================
-# UI HEADER
+# Sidebar – Pengaturan
 # ==========================
-st.set_page_config(page_title="Klasifikasi Hewan & Deteksi Bunga", layout="wide")
-st.title("🌸🐾 Aplikasi Deteksi Bunga & Klasifikasi Hewan")
+st.sidebar.header("🛠️ Pengaturan")
 
-st.sidebar.header("🔧 Pengaturan")
-menu = st.sidebar.radio("Pilih Model:", ["Klasifikasi Hewan (CNN)", "Deteksi Bunga (YOLO)"])
+theme = st.sidebar.radio("Pilih Mode Tampilan:", ["🌞 Terang", "🌙 Gelap", "📖 Redup / Baca"])
+
+# Terapkan mode tampilan
+if theme == "🌞 Terang":
+    st.markdown(
+        """
+        <style>
+        body { background-color: #FFFFFF; color: #000000; }
+        </style>
+        """, unsafe_allow_html=True
+    )
+elif theme == "🌙 Gelap":
+    st.markdown(
+        """
+        <style>
+        body { background-color: #0E1117; color: #FAFAFA; }
+        </style>
+        """, unsafe_allow_html=True
+    )
+elif theme == "📖 Redup / Baca":
+    st.markdown(
+        """
+        <style>
+        body { background-color: #F5F3E7; color: #333333; }
+        </style>
+        """, unsafe_allow_html=True
+    )
+
 st.sidebar.markdown("---")
-st.sidebar.markdown("**📂 Riwayat Prediksi Akan Muncul di Bawah**")
+st.sidebar.markdown("**📂 Riwayat Prediksi Akan Ditampilkan di Bawah.**")
 
 # ==========================
-# RIWAYAT PREDIKSI
+# Riwayat Prediksi
 # ==========================
 if "history" not in st.session_state:
     st.session_state["history"] = []
 
 # ==========================
-# MODE KLASIFIKASI HEWAN
+# Header + Menu Utama di Atas
 # ==========================
-if menu == "Klasifikasi Hewan (CNN)":
+st.title("🌸🐾 Aplikasi Deteksi Bunga & Klasifikasi Hewan")
+
+col1, col2 = st.columns(2)
+with col1:
+    pilih_hewan = st.button("🐾 Klasifikasi Hewan (CNN)", use_container_width=True)
+with col2:
+    pilih_bunga = st.button("🌼 Deteksi Bunga (YOLO)", use_container_width=True)
+
+# ==========================
+# Mode Klasifikasi Hewan
+# ==========================
+if pilih_hewan:
     st.subheader("📘 Mode: Klasifikasi Hewan (TFLite)")
     st.info("Model ini akan mengklasifikasikan gambar menjadi **Kucing**, **Anjing**, atau **Satwa Liar**.")
 
@@ -66,14 +107,13 @@ if menu == "Klasifikasi Hewan (CNN)":
             with st.spinner("🔍 Sedang menganalisis gambar..."):
                 time.sleep(1.5)
 
-                # Preprocessing gambar
+                # Preprocessing
                 img_resized = img.resize((224, 224))
                 img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
 
                 input_details = tflite_interpreter.get_input_details()
                 output_details = tflite_interpreter.get_output_details()
 
-                # Prediksi
                 tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
                 tflite_interpreter.invoke()
                 prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
@@ -86,7 +126,6 @@ if menu == "Klasifikasi Hewan (CNN)":
             else:
                 st.success(f"🐾 Hasil: **{animal_classes[class_index]}** ({confidence:.2%})")
 
-                # Penjelasan edukatif
                 explanations = {
                     "Kucing": "Kucing adalah mamalia karnivora yang sering dipelihara manusia karena sifatnya yang lucu dan jinak.",
                     "Anjing": "Anjing adalah hewan sosial yang dikenal sebagai sahabat manusia dan sering dilatih untuk berbagai tugas.",
@@ -94,7 +133,6 @@ if menu == "Klasifikasi Hewan (CNN)":
                 }
                 st.info(f"📘 Penjelasan: {explanations[animal_classes[class_index]]}")
 
-                # Simpan ke riwayat
                 st.session_state["history"].append({
                     "Model": "CNN (TFLite)",
                     "Prediksi": animal_classes[class_index],
@@ -102,9 +140,9 @@ if menu == "Klasifikasi Hewan (CNN)":
                 })
 
 # ==========================
-# MODE DETEKSI BUNGA (YOLO)
+# Mode Deteksi Bunga
 # ==========================
-elif menu == "Deteksi Bunga (YOLO)":
+elif pilih_bunga:
     st.subheader("🌼 Mode: Deteksi Bunga (YOLO)")
     st.info("Model ini akan mendeteksi bunga **Daisy** dan **Dandelion**.")
 
@@ -141,14 +179,12 @@ elif menu == "Deteksi Bunga (YOLO)":
                 for label, conf in valid_detections:
                     st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
 
-                    # Penjelasan edukatif
                     explanations = {
-                        "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Bunga ini melambangkan kemurnian dan kesederhanaan.",
+                        "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
                         "Dandelion": "Dandelion dikenal dengan kelopak kuning cerah dan biji berbulu putih yang mudah tertiup angin."
                     }
                     st.info(f"📘 Penjelasan: {explanations[label]}")
 
-                    # Simpan ke riwayat
                     st.session_state["history"].append({
                         "Model": "YOLO",
                         "Prediksi": label,
@@ -156,7 +192,7 @@ elif menu == "Deteksi Bunga (YOLO)":
                     })
 
 # ==========================
-# RIWAYAT PREDIKSI
+# Riwayat Prediksi
 # ==========================
 if st.session_state["history"]:
     st.markdown("---")
