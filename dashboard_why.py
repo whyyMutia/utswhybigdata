@@ -31,62 +31,76 @@ flower_classes = ["Daisy", "Dandelion"]
 # ==========================
 # UI
 # ==========================
-st.title("🌸🐾 Deteksi Hewan & Bunga")
+st.title("🌸🐾 Deteksi Bunga & Klasifikasi Hewan")
+menu = st.sidebar.radio("Pilih Model yang Akan Dijalankan:", ["Klasifikasi Hewan (CNN)", "Deteksi Bunga (YOLO)"])
 
-menu = st.sidebar.selectbox("Pilih Mode:", ["Klasifikasi Hewan (TFLite)", "Deteksi Bunga (YOLO)"])
-uploaded_file = st.file_uploader("Unggah Gambar", type=["jpg", "jpeg", "png"])
+# ==========================
+# KONFIRMASI USER
+# ==========================
+if menu == "Klasifikasi Hewan (CNN)":
+    st.subheader("📘 Mode: Klasifikasi Hewan (TFLite)")
+    confirm = st.radio("Apakah kamu yakin gambar yang ingin diunggah adalah **hewan**?", ["Ya", "Tidak"])
 
-if uploaded_file is not None:
-    img = Image.open(uploaded_file)
-    st.image(img, caption="Gambar yang Diupload", use_container_width=True)
+    if confirm == "Tidak":
+        st.warning("⚠️ Pastikan ulang bahwa gambar kamu adalah hewan sebelum mengunggah!")
+    else:
+        uploaded_file = st.file_uploader("Unggah gambar hewan di sini 🐾", type=["jpg", "jpeg", "png"])
+        if uploaded_file:
+            img = Image.open(uploaded_file).convert("RGB")
+            st.image(img, caption="Gambar yang Diupload", use_container_width=True)
 
-    # ==========================
-    # MODE 1: KLASIFIKASI HEWAN (TFLITE)
-    # ==========================
-    if menu == "Klasifikasi Hewan (TFLite)":
-        # Preprocessing gambar
-        img_resized = img.resize((224, 224))
-        img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
+            # Preprocessing gambar
+            img_resized = img.resize((224, 224))
+            img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
 
-        input_details = tflite_interpreter.get_input_details()
-        output_details = tflite_interpreter.get_output_details()
+            input_details = tflite_interpreter.get_input_details()
+            output_details = tflite_interpreter.get_output_details()
 
-        tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
-        tflite_interpreter.invoke()
-        prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
+            # Prediksi
+            tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
+            tflite_interpreter.invoke()
+            prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
 
-        class_index = np.argmax(prediction)
-        confidence = np.max(prediction)
-        predicted_class = animal_classes[class_index]
+            class_index = np.argmax(prediction)
+            confidence = np.max(prediction)
 
-        # Logika sederhana: kalau akurasi terlalu kecil, asumsikan bukan hewan
-        if confidence < 0.5:
-            st.warning("🚫 Gambar ini tidak dikenali sebagai hewan. Silakan unggah gambar hewan (kucing, anjing, atau satwa liar).")
-        else:
-            st.success(f"🐾 Ini adalah **{predicted_class}** dengan probabilitas {confidence:.2%}")
+            if confidence < 0.7:
+                st.error("🚫 Gambar ini tidak dikenali sebagai hewan.")
+            else:
+                st.success(f"🐾 Hasil: **{animal_classes[class_index]}** ({confidence:.2%})")
 
-    # ==========================
-    # MODE 2: DETEKSI BUNGA (YOLO)
-    # ==========================
-    elif menu == "Deteksi Bunga (YOLO)":
-        results = yolo_model(img)
-        boxes = results[0].boxes
+# =====================================================
+# YOLO BAGIAN DETEKSI BUNGA
+# =====================================================
+elif menu == "Deteksi Bunga (YOLO)":
+    st.subheader("🌼 Mode: Deteksi Bunga (YOLO)")
+    confirm = st.radio("Apakah kamu yakin gambar yang ingin diunggah adalah **bunga**?", ["Ya", "Tidak"])
 
-        # Filter hasil berdasarkan confidence dan label valid
-        valid_detections = []
-        if boxes is not None and len(boxes) > 0:
-            for box in boxes:
-                cls_idx = int(box.cls[0])
-                conf = float(box.conf[0])
+    if confirm == "Tidak":
+        st.warning("⚠️ Pastikan ulang bahwa gambar kamu adalah bunga sebelum mengunggah!")
+    else:
+        uploaded_file = st.file_uploader("Unggah gambar bunga di sini 🌸", type=["jpg", "jpeg", "png"])
+        if uploaded_file:
+            img = Image.open(uploaded_file).convert("RGB")
+            st.image(img, caption="Gambar yang Diupload", use_container_width=True)
 
-                # Hanya terima label 0 atau 1 (Daisy/Dandelion) dengan confidence >= 0.6
-                if cls_idx in [0, 1] and conf >= 0.6:
-                    valid_detections.append((flower_classes[cls_idx], conf))
+            # Deteksi objek dengan YOLO
+            results = yolo_model(img)
+            boxes = results[0].boxes
 
-        if not valid_detections:
-            st.error("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Silakan unggah gambar bunga.")
-        else:
-            result_img = results[0].plot()
-            st.image(result_img, caption="Hasil Deteksi Bunga", use_container_width=True)
-            for label, conf in valid_detections:
-                st.success(f"🌸 Terdeteksi: **{label}** ({conf:.2%})")
+            valid_detections = []
+            if boxes is not None and len(boxes) > 0:
+                for box in boxes:
+                    cls_idx = int(box.cls[0])
+                    conf = float(box.conf[0])
+
+                    if cls_idx in [0, 1] and conf >= 0.6:
+                        valid_detections.append((flower_classes[cls_idx], conf))
+
+            if not valid_detections:
+                st.error("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Pastikan gambar yang diunggah adalah bunga.")
+            else:
+                result_img = results[0].plot()
+                st.image(result_img, caption="Hasil Deteksi Bunga", use_container_width=True)
+                for label, conf in valid_detections:
+                    st.success(f"🌸 Terdeteksi: **{label}** ({conf:.2%})")
