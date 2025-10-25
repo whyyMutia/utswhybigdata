@@ -117,6 +117,8 @@ st.sidebar.markdown("**📂 Riwayat Prediksi Akan Ditampilkan di Bawah.**")
 # ==========================
 if "history" not in st.session_state:
     st.session_state["history"] = []
+if "last_action" not in st.session_state:
+    st.session_state["last_action"] = None
 
 # ==========================
 # Header + Menu Utama di Atas
@@ -188,6 +190,7 @@ if st.session_state["mode"] == "hewan":
                     "Prediksi": animal_classes[class_index],
                     "Akurasi": f"{confidence:.2%}"
                 })
+                st.session_state["last_action"] = "upload_hewan"
 
 # ==========================
 # Mode Deteksi Bunga
@@ -241,11 +244,12 @@ elif st.session_state["mode"] == "bunga":
                         "Prediksi": label,
                         "Akurasi": f"{conf:.2%}"
                     })
+                    st.session_state["last_action"] = "upload_bunga"
 
 # ==========================
 # Riwayat Prediksi
 # ==========================
-if st.session_state["history"]:
+if st.session_state["last_action"] in ["upload_hewan", "upload_bunga"]:
     st.markdown("---")
     st.subheader("📊 Riwayat Prediksi")
     st.table(st.session_state["history"])
