@@ -123,16 +123,23 @@ if "history" not in st.session_state:
 # ==========================
 st.title("🌸🐾 Aplikasi Deteksi Bunga & Klasifikasi Hewan")
 
+# --- Inisialisasi state ---
+if "mode" not in st.session_state:
+    st.session_state["mode"] = None  # Belum memilih mode
+
+# --- Tombol navigasi ---
 col1, col2 = st.columns(2)
 with col1:
-    pilih_hewan = st.button("🐾 Klasifikasi Hewan (CNN)", use_container_width=True)
+    if st.button("🐾 Klasifikasi Hewan (CNN)", use_container_width=True):
+        st.session_state["mode"] = "hewan"
 with col2:
-    pilih_bunga = st.button("🌼 Deteksi Bunga (YOLO)", use_container_width=True)
+    if st.button("🌼 Deteksi Bunga (YOLO)", use_container_width=True):
+        st.session_state["mode"] = "bunga"
 
 # ==========================
 # Mode Klasifikasi Hewan
 # ==========================
-if pilih_hewan:
+if st.session_state["mode"] == "hewan":
     st.subheader("📘 Mode: Klasifikasi Hewan (TFLite)")
     st.info("Model ini akan mengklasifikasikan gambar menjadi **Kucing**, **Anjing**, atau **Satwa Liar**.")
 
@@ -148,9 +155,9 @@ if pilih_hewan:
             st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
             with st.spinner("🔍 Sedang menganalisis gambar..."):
+                import time
                 time.sleep(1.5)
 
-                # Preprocessing
                 img_resized = img.resize((224, 224))
                 img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
 
@@ -185,7 +192,7 @@ if pilih_hewan:
 # ==========================
 # Mode Deteksi Bunga
 # ==========================
-elif pilih_bunga:
+elif st.session_state["mode"] == "bunga":
     st.subheader("🌼 Mode: Deteksi Bunga (YOLO)")
     st.info("Model ini akan mendeteksi bunga **Daisy** dan **Dandelion**.")
 
@@ -201,6 +208,7 @@ elif pilih_bunga:
             st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
             with st.spinner("🔍 Sedang mendeteksi objek..."):
+                import time
                 time.sleep(1.5)
                 results = yolo_model(img)
                 boxes = results[0].boxes
