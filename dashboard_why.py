@@ -40,31 +40,34 @@ st.sidebar.header("🛠️ Pengaturan")
 
 theme = st.sidebar.radio("Pilih Mode Tampilan:", ["🌞 Terang", "🌙 Gelap", "📖 Redup / Baca"])
 
-# Terapkan mode tampilan
+# Terapkan mode tampilan (CSS dinamis)
 if theme == "🌞 Terang":
-    st.markdown(
-        """
-        <style>
-        body { background-color: #FFFFFF; color: #000000; }
-        </style>
-        """, unsafe_allow_html=True
-    )
+    bg_color = "#FFFFFF"
+    text_color = "#000000"
 elif theme == "🌙 Gelap":
-    st.markdown(
-        """
-        <style>
-        body { background-color: #0E1117; color: #FAFAFA; }
-        </style>
-        """, unsafe_allow_html=True
-    )
+    bg_color = "#0E1117"
+    text_color = "#FAFAFA"
 elif theme == "📖 Redup / Baca":
-    st.markdown(
-        """
-        <style>
-        body { background-color: #F5F3E7; color: #333333; }
-        </style>
-        """, unsafe_allow_html=True
-    )
+    bg_color = "#F5F3E7"
+    text_color = "#333333"
+
+st.markdown(
+    f"""
+    <style>
+        .stApp {{
+            background-color: {bg_color};
+            color: {text_color};
+        }}
+        div[data-testid="stSidebar"] {{
+            background-color: #22222210;
+        }}
+        h1, h2, h3, h4, h5, h6, p, label, span {{
+            color: {text_color} !important;
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**📂 Riwayat Prediksi Akan Ditampilkan di Bawah.**")
