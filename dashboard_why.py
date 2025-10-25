@@ -57,6 +57,11 @@ elif theme == "📖 Redup / Baca":
     sidebar_bg = "#F5F3E7"
     sidebar_text = "#333333"
 
+if "theme" in st.session_state:
+    if st.session_state["theme"] != theme:
+        st.session_state["last_action"] = None
+st.session_state["theme"] = theme
+
 # ===== CSS dinamis =====
 st.markdown(
     f"""
