@@ -59,10 +59,17 @@ st.markdown(
             color: {text_color};
         }}
         div[data-testid="stSidebar"] {{
-            background-color: #22222210;
+            background-color: {'#1E1E1E' if theme == "🌙 Gelap" else ('#F5F3E7' if theme == "📖 Redup / Baca" else '#F8F9FA')} !important;
         }}
         h1, h2, h3, h4, h5, h6, p, label, span {{
             color: {text_color} !important;
+        }}
+        .stButton > button {{
+            background-color: {'#444444' if theme == "🌙 Gelap" else ('#E6E1C5' if theme == "📖 Redup / Baca" else '#F0F2F6')} !important;
+            color: {text_color} !important;
+            border-radius: 8px;
+            border: none;
+            padding: 0.5em 1em;
         }}
     </style>
     """,
