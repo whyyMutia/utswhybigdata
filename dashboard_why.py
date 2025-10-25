@@ -60,7 +60,7 @@ if uploaded_file is not None:
         predicted_class = animal_classes[class_index]
 
         # Logika sederhana: kalau akurasi terlalu kecil, asumsikan bukan hewan
-        if confidence < 0.6:
+        if confidence < 0.5:
             st.warning("🚫 Gambar ini tidak dikenali sebagai hewan. Silakan unggah gambar hewan (kucing, anjing, atau satwa liar).")
         else:
             st.success(f"🐾 Ini adalah **{predicted_class}** dengan probabilitas {confidence:.2%}")
@@ -72,12 +72,21 @@ if uploaded_file is not None:
         results = yolo_model(img)
         boxes = results[0].boxes
 
-        if boxes is None or len(boxes) == 0:
-            st.warning("🚫 Tidak ada bunga yang terdeteksi. Pastikan gambar berisi Daisy atau Dandelion.")
+        # Filter hasil berdasarkan confidence dan label valid
+        valid_detections = []
+        if boxes is not None and len(boxes) > 0:
+            for box in boxes:
+                cls_idx = int(box.cls[0])
+                conf = float(box.conf[0])
+
+                # Hanya terima label 0 atau 1 (Daisy/Dandelion) dengan confidence >= 0.6
+                if cls_idx in [0, 1] and conf >= 0.6:
+                    valid_detections.append((flower_classes[cls_idx], conf))
+
+        if not valid_detections:
+            st.warning("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Pastikan gambar berisi bunga, bukan hewan atau objek lain.")
         else:
-            labels = [flower_classes[int(box.cls[0])] if int(box.cls[0]) < len(flower_classes) else "Unknown" for box in boxes]
             result_img = results[0].plot()
             st.image(result_img, caption="Hasil Deteksi Bunga", use_container_width=True)
-
-            for i, label in enumerate(labels):
-                st.success(f"🌼 Terdeteksi: **{label}** (Objek ke-{i+1})")
+            for i, (label, conf) in enumerate(valid_detections):
+                st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
