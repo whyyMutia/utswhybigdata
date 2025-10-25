@@ -11,11 +11,20 @@ import cv2
 # ==========================
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO("model/whymutia_laporan4.pt")  # Model deteksi objek
-    classifier = tf.keras.models.load_model("model/whymutia_laporan2.tflite")  # Model klasifikasi
-    return yolo_model, classifier
+    # Model deteksi objek YOLO
+    yolo_model = YOLO("model/whymutia_laporan4.pt")
 
-yolo_model, classifier = load_models()
+    # Model klasifikasi TFLite
+    interpreter = tf.lite.Interpreter(model_path="model/whymutia_laporan2.tflite")
+    interpreter.allocate_tensors()
+
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    return yolo_model, interpreter, input_details, output_details
+
+
+yolo_model, interpreter, input_details, output_details = load_models()
 
 # ==========================
 # UI
@@ -38,13 +47,18 @@ if uploaded_file is not None:
 
     elif menu == "Klasifikasi Gambar":
         # Preprocessing
-        img_resized = img.resize((224, 224))  # sesuaikan ukuran dengan model kamu
+        img_resized = img.resize((224, 224))
         img_array = image.img_to_array(img_resized)
-        img_array = np.expand_dims(img_array, axis=0)
+        img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
         img_array = img_array / 255.0
 
-        # Prediksi
-        prediction = classifier.predict(img_array)
+        # 🔹 Prediksi dengan model TFLite
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        prediction = interpreter.get_tensor(output_details[0]['index'])[0]
+
         class_index = np.argmax(prediction)
-        st.write("### Hasil Prediksi:", class_index)
-        st.write("Probabilitas:", np.max(prediction))
+        class_names = ['Kelas 1', 'Kelas 2', 'Kelas 3']  # ganti dengan nama kelas model kamu
+
+        st.write("### Hasil Prediksi:", class_names[class_index] if class_index < len(class_names) else class_index)
+        st.write("Probabilitas:", float(np.max(prediction)))
