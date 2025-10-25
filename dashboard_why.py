@@ -84,9 +84,9 @@ if uploaded_file is not None:
                     valid_detections.append((flower_classes[cls_idx], conf))
 
         if not valid_detections:
-            st.warning("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Pastikan gambar berisi bunga, bukan hewan atau objek lain.")
+            st.error("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Silakan unggah gambar bunga.")
         else:
             result_img = results[0].plot()
             st.image(result_img, caption="Hasil Deteksi Bunga", use_container_width=True)
-            for i, (label, conf) in enumerate(valid_detections):
-                st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
+            for label, conf in valid_detections:
+                st.success(f"🌸 Terdeteksi: **{label}** ({conf:.2%})")
