@@ -44,27 +44,42 @@ theme = st.sidebar.radio("Pilih Mode Tampilan:", ["🌞 Terang", "🌙 Gelap", "
 if theme == "🌞 Terang":
     bg_color = "#FFFFFF"
     text_color = "#000000"
+    sidebar_bg = "#F8F9FA"
+    sidebar_text = "#000000"
 elif theme == "🌙 Gelap":
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
+    sidebar_bg = "#0E1117"
+    sidebar_text = "#FAFAFA"
 elif theme == "📖 Redup / Baca":
     bg_color = "#F5F3E7"
     text_color = "#333333"
+    sidebar_bg = "#F5F3E7"
+    sidebar_text = "#333333"
 
 st.markdown(
     f"""
     <style>
+        /* ===== Tampilan utama ===== */
         .stApp {{
             background-color: {bg_color};
             color: {text_color};
         }}
+
+        /* ===== Sidebar ===== */
         div[data-testid="stSidebar"] {{
-            background-color: {'#0E1117' if theme == "🌙 Gelap" else ('#F5F3E7' if theme == "📖 Redup / Baca" else '#F8F9FA')} !important;
-            color: {'#FAFAFA' if theme == "🌙 Gelap" else ('#333333' if theme == "📖 Redup / Baca" else '#000000')} !important;
+            background-color: {sidebar_bg} !important;
         }}
+        div[data-testid="stSidebar"] * {{
+            color: {sidebar_text} !important;
+        }}
+
+        /* ===== Heading dan teks utama ===== */
         h1, h2, h3, h4, h5, h6, p, label, span {{
             color: {text_color} !important;
         }}
+
+        /* ===== Tombol ===== */
         .stButton > button {{
             background-color: {'#444444' if theme == "🌙 Gelap" else ('#E6E1C5' if theme == "📖 Redup / Baca" else '#F0F2F6')} !important;
             color: {text_color} !important;
