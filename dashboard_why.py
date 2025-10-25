@@ -57,10 +57,8 @@ elif theme == "📖 Redup / Baca":
     sidebar_bg = "#F5F3E7"
     sidebar_text = "#333333"
 
-if "theme" in st.session_state:
-    if st.session_state["theme"] != theme:
-        st.session_state["last_action"] = None
-st.session_state["theme"] = theme
+if "last_action" in st.session_state and st.session_state["last_action"] not in ["upload_hewan", "upload_bunga"]:
+    st.session_state["last_action"] = None
 
 # ===== CSS dinamis =====
 st.markdown(
