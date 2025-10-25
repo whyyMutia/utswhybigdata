@@ -156,6 +156,12 @@ if st.session_state["mode"] == "hewan":
         uploaded_file = st.file_uploader("Unggah gambar hewan di sini 🐾", type=["jpg", "jpeg", "png"])
 
         if uploaded_file:
+            if "last_uploaded" not in st.session_state or st.session_state["last_uploaded"] != uploaded_file.name:
+                st.session_state["last_uploaded"] = uploaded_file.name
+                is_new_upload = True
+            else:
+                is_new_upload = False
+                
             img = Image.open(uploaded_file).convert("RGB")
             st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
@@ -188,6 +194,7 @@ if st.session_state["mode"] == "hewan":
                 }
                 st.info(f"📘 Penjelasan: {explanations[animal_classes[class_index]]}")
 
+            if is_new_upload:
                 st.session_state["history"].append({
                     "Model": "CNN (TFLite)",
                     "Prediksi": animal_classes[class_index],
@@ -210,6 +217,12 @@ elif st.session_state["mode"] == "bunga":
         uploaded_file = st.file_uploader("Unggah gambar bunga di sini 🌸", type=["jpg", "jpeg", "png"])
 
         if uploaded_file:
+            if "last_uploaded" not in st.session_state or st.session_state["last_uploaded"] != uploaded_file.name:
+                st.session_state["last_uploaded"] = uploaded_file.name
+                is_new_upload = True
+            else:
+                is_new_upload = False
+                
             img = Image.open(uploaded_file).convert("RGB")
             st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
@@ -242,6 +255,7 @@ elif st.session_state["mode"] == "bunga":
                     }
                     st.info(f"📘 Penjelasan: {explanations[label]}")
 
+                if is_new_upload:
                     st.session_state["history"].append({
                         "Model": "YOLO",
                         "Prediksi": label,
