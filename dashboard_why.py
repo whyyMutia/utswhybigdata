@@ -29,71 +29,106 @@ animal_classes = ["Kucing", "Anjing", "Satwa Liar"]
 flower_classes = ["Daisy", "Dandelion"]
 
 # ==========================
-# UI
+# UI HEADER
 # ==========================
-st.title("🌸🐾 Deteksi Bunga & Klasifikasi Hewan")
-menu = st.sidebar.radio("Pilih Model yang Akan Dijalankan:", ["Klasifikasi Hewan (CNN)", "Deteksi Bunga (YOLO)"])
+st.set_page_config(page_title="Klasifikasi Hewan & Deteksi Bunga", layout="wide")
+st.title("🌸🐾 Aplikasi Deteksi Bunga & Klasifikasi Hewan")
+
+st.sidebar.header("🔧 Pengaturan")
+menu = st.sidebar.radio("Pilih Model:", ["Klasifikasi Hewan (CNN)", "Deteksi Bunga (YOLO)"])
+st.sidebar.markdown("---")
+st.sidebar.markdown("**📂 Riwayat Prediksi Akan Muncul di Bawah**")
 
 # ==========================
-# KONFIRMASI USER
+# RIWAYAT PREDIKSI
+# ==========================
+if "history" not in st.session_state:
+    st.session_state["history"] = []
+
+# ==========================
+# MODE KLASIFIKASI HEWAN
 # ==========================
 if menu == "Klasifikasi Hewan (CNN)":
     st.subheader("📘 Mode: Klasifikasi Hewan (TFLite)")
+    st.info("Model ini akan mengklasifikasikan gambar menjadi **Kucing**, **Anjing**, atau **Satwa Liar**.")
+
     confirm = st.radio("Apakah kamu yakin gambar yang ingin diunggah adalah **hewan**?", ["Ya", "Tidak"])
 
     if confirm == "Tidak":
         st.warning("⚠️ Pastikan ulang bahwa gambar kamu adalah hewan sebelum mengunggah!")
     else:
         uploaded_file = st.file_uploader("Unggah gambar hewan di sini 🐾", type=["jpg", "jpeg", "png"])
+
         if uploaded_file:
             img = Image.open(uploaded_file).convert("RGB")
-            st.image(img, caption="Gambar yang Diupload", use_container_width=True)
+            st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
-            # Preprocessing gambar
-            img_resized = img.resize((224, 224))
-            img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
+            with st.spinner("🔍 Sedang menganalisis gambar..."):
+                time.sleep(1.5)
 
-            input_details = tflite_interpreter.get_input_details()
-            output_details = tflite_interpreter.get_output_details()
+                # Preprocessing gambar
+                img_resized = img.resize((224, 224))
+                img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0).astype(np.float32)
 
-            # Prediksi
-            tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
-            tflite_interpreter.invoke()
-            prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
+                input_details = tflite_interpreter.get_input_details()
+                output_details = tflite_interpreter.get_output_details()
 
-            class_index = np.argmax(prediction)
-            confidence = np.max(prediction)
+                # Prediksi
+                tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
+                tflite_interpreter.invoke()
+                prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
+
+                class_index = np.argmax(prediction)
+                confidence = np.max(prediction)
 
             if confidence < 0.7:
                 st.error("🚫 Gambar ini tidak dikenali sebagai hewan.")
             else:
                 st.success(f"🐾 Hasil: **{animal_classes[class_index]}** ({confidence:.2%})")
 
-# =====================================================
-# YOLO BAGIAN DETEKSI BUNGA
-# =====================================================
+                # Penjelasan edukatif
+                explanations = {
+                    "Kucing": "Kucing adalah mamalia karnivora yang sering dipelihara manusia karena sifatnya yang lucu dan jinak.",
+                    "Anjing": "Anjing adalah hewan sosial yang dikenal sebagai sahabat manusia dan sering dilatih untuk berbagai tugas.",
+                    "Satwa Liar": "Satwa liar adalah hewan yang hidup di alam bebas, seperti harimau, singa, atau rubah."
+                }
+                st.info(f"📘 Penjelasan: {explanations[animal_classes[class_index]]}")
+
+                # Simpan ke riwayat
+                st.session_state["history"].append({
+                    "Model": "CNN (TFLite)",
+                    "Prediksi": animal_classes[class_index],
+                    "Akurasi": f"{confidence:.2%}"
+                })
+
+# ==========================
+# MODE DETEKSI BUNGA (YOLO)
+# ==========================
 elif menu == "Deteksi Bunga (YOLO)":
     st.subheader("🌼 Mode: Deteksi Bunga (YOLO)")
+    st.info("Model ini akan mendeteksi bunga **Daisy** dan **Dandelion**.")
+
     confirm = st.radio("Apakah kamu yakin gambar yang ingin diunggah adalah **bunga**?", ["Ya", "Tidak"])
 
     if confirm == "Tidak":
         st.warning("⚠️ Pastikan ulang bahwa gambar kamu adalah bunga sebelum mengunggah!")
     else:
         uploaded_file = st.file_uploader("Unggah gambar bunga di sini 🌸", type=["jpg", "jpeg", "png"])
+
         if uploaded_file:
             img = Image.open(uploaded_file).convert("RGB")
-            st.image(img, caption="Gambar yang Diupload", use_container_width=True)
+            st.image(img, caption="📸 Gambar yang Diupload", use_container_width=True)
 
-            # Deteksi objek dengan YOLO
-            results = yolo_model(img)
-            boxes = results[0].boxes
+            with st.spinner("🔍 Sedang mendeteksi objek..."):
+                time.sleep(1.5)
+                results = yolo_model(img)
+                boxes = results[0].boxes
 
             valid_detections = []
             if boxes is not None and len(boxes) > 0:
                 for box in boxes:
                     cls_idx = int(box.cls[0])
                     conf = float(box.conf[0])
-
                     if cls_idx in [0, 1] and conf >= 0.6:
                         valid_detections.append((flower_classes[cls_idx], conf))
 
@@ -101,6 +136,29 @@ elif menu == "Deteksi Bunga (YOLO)":
                 st.error("🚫 Tidak terdeteksi bunga Daisy atau Dandelion. Pastikan gambar yang diunggah adalah bunga.")
             else:
                 result_img = results[0].plot()
-                st.image(result_img, caption="Hasil Deteksi Bunga", use_container_width=True)
+                st.image(result_img, caption="🌸 Hasil Deteksi Bunga", use_container_width=True)
+
                 for label, conf in valid_detections:
-                    st.success(f"🌸 Terdeteksi: **{label}** ({conf:.2%})")
+                    st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
+
+                    # Penjelasan edukatif
+                    explanations = {
+                        "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Bunga ini melambangkan kemurnian dan kesederhanaan.",
+                        "Dandelion": "Dandelion dikenal dengan kelopak kuning cerah dan biji berbulu putih yang mudah tertiup angin."
+                    }
+                    st.info(f"📘 Penjelasan: {explanations[label]}")
+
+                    # Simpan ke riwayat
+                    st.session_state["history"].append({
+                        "Model": "YOLO",
+                        "Prediksi": label,
+                        "Akurasi": f"{conf:.2%}"
+                    })
+
+# ==========================
+# RIWAYAT PREDIKSI
+# ==========================
+if st.session_state["history"]:
+    st.markdown("---")
+    st.subheader("📊 Riwayat Prediksi")
+    st.table(st.session_state["history"])
