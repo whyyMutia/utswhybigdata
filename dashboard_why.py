@@ -284,7 +284,7 @@ elif st.session_state["mode"] == "bunga":
                 #ambil confidence maksimum tiap jenis bunga supaya deteksi hanya muncul sekali
                 flower_max_conf = {}
                 for label, conf in valid_detections:
-                    if label not in flower_max_conf of conf > flower_max_conf[label]:
+                    if label not in flower_max_conf or conf > flower_max_conf[label]:
                         flower_max_conf[label] = conf
 
                 #label unik untuk penjelasan (hanya muncul sekali per jenis bunga)
