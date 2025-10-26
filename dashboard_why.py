@@ -38,7 +38,15 @@ flower_classes = ["Daisy", "Dandelion"]
 # ==========================
 # Sidebar – Pengaturan
 # ==========================
-st.sidebar.header("🛠️ Pengaturan")
+language = st.sidebar.radio(
+    "Bahasa Tampilan / Language:", 
+    ["Indonesia", "English"]
+)
+
+# Tentukan kode bahasa untuk dictionary sidebar
+sidebar_lang = "id" if language == "Indonesia" else "en"
+
+# Dictionary teks sidebar
 sidebar_texts = {
     "id": {
         "header": "🛠️ Pengaturan",
@@ -59,8 +67,8 @@ sidebar_texts = {
         "guide": "📖 User Guide"
     }
 }
-sidebar_lang = "id" if language == "Indonesia" else "en"
 
+# Header Sidebar
 st.sidebar.header(sidebar_texts[sidebar_lang]["header"])
 
 # Tema
@@ -79,12 +87,6 @@ size_dict = {
     "Small": 128, "Medium": 224, "Big": 384
 }
 img_display_size = size_dict[img_size]
-
-# Bahasa
-language = st.sidebar.radio(
-    sidebar_texts[sidebar_lang]["language_label"], 
-    ["Indonesia", "English"]
-)
 
 # Panduan Pengguna
 with st.sidebar.expander(sidebar_texts[sidebar_lang]["guide"]):
