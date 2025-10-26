@@ -276,15 +276,18 @@ elif st.session_state["mode"] == "bunga":
             if not valid_detections:
                 st.error(texts[lang]["error_no_flower"])
             else:
+                #tampilkan gambar dengan bounding box semua bunga
                 result_img = results[0].plot()
                 result_img = Image.fromarray(result_img).resize((img_display_size, img_display_size))
                 st.image(result_img, caption="🌸 Hasil Deteksi Bunga", width=img_display_size)
 
+                #ambil confidence maksimum tiap jenis bunga supaya deteksi hanya muncul sekali
+                flower_max_conf = {}
                 for label, conf in valid_detections:
-                    st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
+                    if label not in flower_max_conf of conf > flower_max_conf[label]:
+                        flower_max_conf[label] = conf
 
                 #label unik untuk penjelasan (hanya muncul sekali per jenis bunga)
-                unique_labels = list(set([label for label, _ in valid_detections]))
                 flower_explanations = {
                     "id": {
                         "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
@@ -295,7 +298,8 @@ elif st.session_state["mode"] == "bunga":
                         "Dandelion": "Dandelion is known for bright yellow petals and white fluffy seeds easily blown by the wind."
                     }
                 }
-                for label in unique_labels:
+                for label, conf in flower_max_conf.items():
+                    st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
                     st.info(f"📘 Penjelasan: {flower_explanations[lang][label]}")
 
                     if is_new_upload:
