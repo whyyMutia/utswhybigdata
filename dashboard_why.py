@@ -282,6 +282,9 @@ elif st.session_state["mode"] == "bunga":
 
                 for label, conf in valid_detections:
                     st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
+
+                #label unik untuk penjelasan (hanya muncul sekali per jenis bunga)
+                unique_labels = list(set([label] for label, _ in valid_detections]))
                     flower_explanations = {
                         "id": {
                             "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
@@ -291,7 +294,8 @@ elif st.session_state["mode"] == "bunga":
                             "Daisy": "Daisy has white petals with a yellow center. It symbolizes purity and simplicity.",
                             "Dandelion": "Dandelion is known for bright yellow petals and white fluffy seeds easily blown by the wind."
                         }
-                    }      
+                    }
+                for label in unique_labels:
                     st.info(f"📘 Penjelasan: {flower_explanations[lang][label]}")
 
                     if is_new_upload:
