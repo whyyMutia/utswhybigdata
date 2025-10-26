@@ -37,12 +37,21 @@ flower_classes = ["Daisy", "Dandelion"]
 # ==========================
 # Sidebar – Pengaturan
 # ==========================
+language_label_text = {
+    "id": "Bahasa Tampilan:",
+    "en": "Display Language:"
+}
+
+# Tentukan kode bahasa sementara, default "id"
+sidebar_lang_temp = "id" if "Indonesia" in ["Indonesia","English"] else "en"
+
+# Radio untuk pilih bahasa dengan label sesuai bahasa
 language = st.sidebar.radio(
-    "Bahasa Tampilan / Language:", 
+    language_label_text[sidebar_lang_temp],
     ["Indonesia", "English"]
 )
 
-# Tentukan kode bahasa untuk dictionary sidebar
+# Update sidebar_lang sesuai pilihan user
 sidebar_lang = "id" if language == "Indonesia" else "en"
 
 # Dictionary teks sidebar
