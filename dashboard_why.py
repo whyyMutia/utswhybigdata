@@ -59,7 +59,7 @@ sidebar_texts = {
     "id": {
         "header": "🛠️ Pengaturan",
         "theme_label": "Pilih Mode Tampilan:",
-        "theme_options": ["🌞 Terang", "🌙 Gelap", "📖 Redup / Baca"],
+        "theme_options": ["🌞 Terang", "🌙 Gelap", "📖 Redup"],
         "img_size_label": "Ukuran Gambar:",
         "img_size_options": ["Kecil", "Sedang", "Besar"],
         "language_label": "Bahasa Tampilan:",
@@ -68,7 +68,7 @@ sidebar_texts = {
     "en": {
         "header": "🛠️ Settings",
         "theme_label": "Select Display Mode:",
-        "theme_options": ["🌞 Light", "🌙 Dark", "📖 Dim / Reading"],
+        "theme_options": ["🌞 Light", "🌙 Dark", "📖 Dim"],
         "img_size_label": "Picture Size:",
         "img_size_options": ["Small", "Medium", "Big"],
         "language_label": "Language:",
@@ -100,14 +100,16 @@ img_display_size = size_dict[img_size]
 with st.sidebar.expander(sidebar_texts[sidebar_lang]["guide"]):
     if language == "Indonesia":
         st.markdown("""
-        - Pilih mode: **Klasifikasi Hewan** atau **Deteksi Bunga**  
+        - Pilih ingin **Klasifikasi Hewan** atau **Deteksi Bunga**
+        - **Ingat!** Hanya gambar hewan untuk klasifikasi dan gambar bunga untuk deteksi gambar
         - Unggah gambar sesuai mode yang dipilih  
         - Tunggu hingga prediksi muncul  
         - Lihat riwayat prediksi di bawah
         """)
     else:
         st.markdown("""
-        - Select mode: **Animal Classification** or **Flower Detection**  
+        - Select wheter **Animal Classification** or **Flower Detection**
+        - **Remember!** Only animal images are suitable for classification and flower images are suitable for detection
         - Upload image according to selected mode  
         - Wait for prediction results  
         - Check prediction history below
@@ -267,12 +269,12 @@ if st.session_state["mode"] == "hewan":
                     "id": {
                         "Kucing": "Kucing adalah mamalia karnivora yang sering dipelihara manusia karena sifatnya yang lucu dan jinak.",
                         "Anjing": "Anjing adalah hewan sosial yang dikenal sebagai sahabat manusia dan sering dilatih untuk berbagai tugas.",
-                        "Satwa Liar": "Satwa liar adalah hewan yang hidup di alam bebas, seperti harimau, singa, atau rubah.",
+                        "Satwa Liar": "Satwa liar adalah hewan yang hidup di alam bebas, seperti harimau, singa, rubah, atau cheetah.",
                     },
                     "en": {
                         "Cat": "Cats are carnivorous mammals commonly kept as pets due to their cute and friendly nature.",
                         "Dog": "Dogs are social animals known as human companions and trained for various tasks.",
-                        "Wild Animal": "Wild animals live freely in nature, like tigers, lions, or foxes."
+                        "Wild Animal": "Wild animals live freely in nature, like tigers, lions, foxes, or cheetah's."
                     }
                 }
                 st.info(f"📘 Penjelasan: {animal_explanations[lang][label]}")
