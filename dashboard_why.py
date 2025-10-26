@@ -185,17 +185,24 @@ if st.session_state["mode"] == "hewan":
             else:
                 is_new_upload = False
 
+           # Buka gambar
             img = Image.open(uploaded_file).convert("RGB")
-            st.image(img, caption="📸 Gambar yang Diupload", width=img_display_size)
+
+            # --- Resize untuk display sesuai pilihan user ---
+            img_display = img.resize((img_display_size, img_display_size))
+            st.image(img_display, caption="📸 Gambar yang Diupload", width=img_display_size)
 
             with st.spinner("🔍 Sedang menganalisis gambar..." if language=="Indonesia" else "🔍 Analyzing image..."):
                 import time; time.sleep(1.5)
+
+                # --- Resize untuk model TFLite sesuai input model ---
                 input_details = tflite_interpreter.get_input_details()
                 output_details = tflite_interpreter.get_output_details()
-                # Resize tetap untuk model input (biasanya 224x224)
-                input_shape = input_details[0]['shape'][1:3]
-                img_resized_model = img.resize((input_shape[1], input_shape[0]))
-                img_array = np.expand_dims(np.array(img_resized_model)/255.0, axis=0).astype(np.float32)
+                input_shape = input_details[0]['shape'][1:3]  # ex: (224,224)
+                img_for_model = img.resize((input_shape[1], input_shape[0]))
+                img_array = np.expand_dims(np.array(img_for_model)/255.0, axis=0).astype(np.float32)
+
+                # Prediksi
                 tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
                 tflite_interpreter.invoke()
                 prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
