@@ -148,12 +148,22 @@ lang = "id" if language == "Indonesia" else "en"
 # Header + Menu Utama
 # ==========================
 st.title(texts[lang]["title"])
+menu_texts = {
+    "id": {
+        "animal_button": "🐾 Klasifikasi Hewan (CNN)",
+        "flower_button": "🌼 Deteksi Bunga (YOLO)"
+    },
+    "en": {
+        "animal_button": "🐾 Animal Classification (CNN)",
+        "flower_button": "🌼 Flower Detection (YOLO)"
+    }
+}
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("🐾 Klasifikasi Hewan (CNN)", use_container_width=True):
+    if st.button(menu_texts[lang]["animal_button"], use_container_width=True):
         st.session_state["mode"] = "hewan"
 with col2:
-    if st.button("🌼 Deteksi Bunga (YOLO)", use_container_width=True):
+    if st.button(menu_texts[lang]["flower_button"], use_container_width=True):
         st.session_state["mode"] = "bunga"
 
 # ==========================
