@@ -284,7 +284,7 @@ elif st.session_state["mode"] == "bunga":
                     st.success(f"🌼 Terdeteksi: **{label}** ({conf:.2%})")
 
                 #label unik untuk penjelasan (hanya muncul sekali per jenis bunga)
-                unique_labels = list(set([label] for label, _ in valid_detections]))
+                unique_labels = list(set([label for label, _ in valid_detections]))
                     flower_explanations = {
                         "id": {
                             "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
