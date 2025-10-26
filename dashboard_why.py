@@ -32,7 +32,6 @@ yolo_model, tflite_interpreter = load_models()
 # ==========================
 animal_classes = ["Kucing", "Anjing", "Satwa Liar"]
 animal_classes_en = ["Cat", "Dog", "Wild Animal"]
-
 flower_classes = ["Daisy", "Dandelion"]
 
 # ==========================
@@ -114,6 +113,8 @@ elif theme == "🌙 Gelap":
     bg_color = "#0E1117"; text_color = "#FAFAFA"; sidebar_bg = "#0E1117"; sidebar_text = "#FAFAFA"
 elif theme == "📖 Redup / Baca":
     bg_color = "#F5F3E7"; text_color = "#333333"; sidebar_bg = "#F5F3E7"; sidebar_text = "#333333"
+else:
+    bg_color = "#FFFFFF"; text_color = "#000000"; sidebar_bg = "#F8F9FA"; sidebar_text = "#000000"
 
 st.markdown(
     f"""
@@ -151,6 +152,7 @@ if "mode" not in st.session_state: st.session_state["mode"] = None
 # ==========================
 # Dictionary teks sesuai bahasa
 # ==========================
+lang = "id" if language == "Indonesia" else "en"
 texts = {
     "id": {
         "title": "🌸🐾 Aplikasi Deteksi Bunga & Klasifikasi Hewan",
@@ -179,7 +181,6 @@ texts = {
         "history": "📊 Prediction History"
     }
 }
-lang = "id" if language == "Indonesia" else "en"
 
 # ==========================
 # Header + Menu Utama
