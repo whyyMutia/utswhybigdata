@@ -190,11 +190,12 @@ if st.session_state["mode"] == "hewan":
 
             with st.spinner("🔍 Sedang menganalisis gambar..." if language=="Indonesia" else "🔍 Analyzing image..."):
                 import time; time.sleep(1.5)
-                img_resized = img.resize((img_display_size, img_display_size))
-                img_array = np.expand_dims(np.array(img_resized)/255.0, axis=0).astype(np.float32)
-
                 input_details = tflite_interpreter.get_input_details()
                 output_details = tflite_interpreter.get_output_details()
+                # Resize tetap untuk model input (biasanya 224x224)
+                input_shape = input_details[0]['shape'][1:3]
+                img_resized_model = img.resize((input_shape[1], input_shape[0]))
+                img_array = np.expand_dims(np.array(img_resized_model)/255.0, axis=0).astype(np.float32)
                 tflite_interpreter.set_tensor(input_details[0]['index'], img_array)
                 tflite_interpreter.invoke()
                 prediction = tflite_interpreter.get_tensor(output_details[0]['index'])[0]
@@ -202,7 +203,7 @@ if st.session_state["mode"] == "hewan":
                 class_index = np.argmax(prediction)
                 confidence = np.max(prediction)
 
-            if confidence < 0.7:
+            if confidence < 0.5:
                 st.error(texts[lang]["error_no_animal"])
             else:
                 label = animal_classes[class_index] if language=="Indonesia" else animal_classes_en[class_index]
