@@ -39,20 +39,55 @@ flower_classes = ["Daisy", "Dandelion"]
 # Sidebar – Pengaturan
 # ==========================
 st.sidebar.header("🛠️ Pengaturan")
+sidebar_texts = {
+    "id": {
+        "header": "🛠️ Pengaturan",
+        "theme_label": "Pilih Mode Tampilan:",
+        "theme_options": ["🌞 Terang", "🌙 Gelap", "📖 Redup / Baca"],
+        "img_size_label": "Ukuran Gambar:",
+        "img_size_options": ["Kecil", "Sedang", "Besar"],
+        "language_label": "Bahasa Tampilan:",
+        "guide": "📖 Panduan Pengguna"
+    },
+    "en": {
+        "header": "🛠️ Settings",
+        "theme_label": "Select Display Mode:",
+        "theme_options": ["🌞 Light", "🌙 Dark", "📖 Dim / Reading"],
+        "img_size_label": "Picture Size:",
+        "img_size_options": ["Small", "Medium", "Big"],
+        "language_label": "Language:",
+        "guide": "📖 User Guide"
+    }
+}
+sidebar_lang = "id" if language == "Indonesia" else "en"
+
+st.sidebar.header(sidebar_texts[sidebar_lang]["header"])
 
 # Tema
-theme = st.sidebar.radio("Pilih Mode Tampilan:", ["🌞 Terang", "🌙 Gelap", "📖 Redup / Baca"])
+theme = st.sidebar.radio(
+    sidebar_texts[sidebar_lang]["theme_label"], 
+    sidebar_texts[sidebar_lang]["theme_options"]
+)
 
 # Ukuran gambar
-img_size = st.sidebar.selectbox("Ukuran Gambar:", ["Kecil", "Sedang", "Besar"])
-size_dict = {"Kecil": 128, "Sedang": 224, "Besar": 384}
+img_size = st.sidebar.selectbox(
+    sidebar_texts[sidebar_lang]["img_size_label"],
+    sidebar_texts[sidebar_lang]["img_size_options"]
+)
+size_dict = {
+    "Kecil": 128, "Sedang": 224, "Besar": 384,
+    "Small": 128, "Medium": 224, "Big": 384
+}
 img_display_size = size_dict[img_size]
 
 # Bahasa
-language = st.sidebar.radio("Bahasa Tampilan:", ["Indonesia", "English"])
+language = st.sidebar.radio(
+    sidebar_texts[sidebar_lang]["language_label"], 
+    ["Indonesia", "English"]
+)
 
 # Panduan Pengguna
-with st.sidebar.expander("📖 Panduan Pengguna"):
+with st.sidebar.expander(sidebar_texts[sidebar_lang]["guide"]):
     if language == "Indonesia":
         st.markdown("""
         - Pilih mode: **Klasifikasi Hewan** atau **Deteksi Bunga**  
