@@ -285,16 +285,16 @@ elif st.session_state["mode"] == "bunga":
 
                 #label unik untuk penjelasan (hanya muncul sekali per jenis bunga)
                 unique_labels = list(set([label for label, _ in valid_detections]))
-                    flower_explanations = {
-                        "id": {
-                            "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
-                            "Dandelion": "Dandelion dikenal dengan kelopak kuning cerah dan biji berbulu putih yang mudah tertiup angin."
-                        },
-                        "en": {
-                            "Daisy": "Daisy has white petals with a yellow center. It symbolizes purity and simplicity.",
-                            "Dandelion": "Dandelion is known for bright yellow petals and white fluffy seeds easily blown by the wind."
-                        }
+                flower_explanations = {
+                    "id": {
+                        "Daisy": "Daisy memiliki kelopak putih dengan tengah berwarna kuning. Melambangkan kemurnian dan kesederhanaan.",
+                        "Dandelion": "Dandelion dikenal dengan kelopak kuning cerah dan biji berbulu putih yang mudah tertiup angin."
+                    },
+                    "en": {
+                        "Daisy": "Daisy has white petals with a yellow center. It symbolizes purity and simplicity.",
+                        "Dandelion": "Dandelion is known for bright yellow petals and white fluffy seeds easily blown by the wind."
                     }
+                }
                 for label in unique_labels:
                     st.info(f"📘 Penjelasan: {flower_explanations[lang][label]}")
 
